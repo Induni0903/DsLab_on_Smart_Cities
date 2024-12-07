@@ -1,0 +1,168 @@
+---
+title: ''
+author: ""
+date: "2024-08-23"
+output: html_document
+---
+
+# **Data Science Lab for Smart Cities**
+
+## **Master's Degree in Data Science (A.Y. 2023/2024)**
+
+## **University of Milano - Bicocca**
+
+
+```{r message=FALSE, warning=FALSE}
+
+library(dplyr)
+library(readr)
+library(caret)
+```
+
+
+
+```{r}
+crime <- read_csv("C:/Users/1999i/Documents/smart_cities/Crime/crime.csv")
+dim(crime)
+head(crime)
+
+
+```
+
+
+
+```{r}
+table(crime$DISTRICT)
+```
+
+
+## Crimes related to property
+
+```{r}
+# Property Crimes:
+
+#Arson
+#Auto Theft
+#Burglary - No Property Taken
+#Commercial Burglary
+#Larceny
+#Larceny From Motor Vehicle
+#Residential Burglary
+#Vandalism
+#Other Burglary
+#Property Related Damage
+
+pc_na <- subset(crime, OFFENSE_CODE_GROUP %in% c("Arson", "Auto Theft", "Burglary - No Property Taken","Commercial Burglary","Larceny","Larceny From Motor Vehicle","Residential Burglary","Vandalism","Other Burglary","Property Related Damage"))
+dim(pc_na)
+
+# Total missing data in the dataset
+blank = sum(is.na(pc_na))
+cat("Total Na values:",blank,"\n")
+
+```
+
+
+```{r}
+# Missing data per column
+na_counts <- colSums(is.na(pc_na))
+cat("Total number of NA per column: ","\n")
+na_counts
+s <- ( 67113/ 67131)*100
+cat("Percentage of the missing values for shooting attribute: ",s,"\n")
+b <- (228 /67131)*100
+cat("Percentage of the missing values for district attribute: ",b,"\n")
+w <- (2156 /67131)*100
+cat("Percentage of the missing values for REPORTING_AREA attribute: ",w,"\n")
+r <- (1128/67131)*100
+cat("Percentage of the missing values for street attribute: ",r,"\n")
+r <- (2266/67131)*100
+cat("Percentage of the missing values for Latitude attribute: ",r,"\n")
+r <- (2266/67131)*100
+cat("Percentage of the missing values for Longitude attribute: ",r,"\n")
+
+```
+
+
+
+
+```{r}
+# removing rows with -1 lat and long
+pc_ <- pc_na %>% select(-SHOOTING) %>% filter(Long != -1) %>% filter(Lat != -1)
+
+# Missing data per column
+na_counts <- colSums(is.na(pc_))
+cat("Total number of NA per column after removing -1 latitude and longitude: ","\n")
+na_counts
+
+
+# removing na data: district
+# removing na rows
+pc <- pc_ %>%
+  filter(!is.na(DISTRICT))
+
+# Missing data per column
+na_counts <- colSums(is.na(pc))
+cat("Total number of NA per column: ","\n")
+na_counts
+
+
+
+```
+
+
+
+```{r}
+dim(pc)
+# checking for 0 rows in lat and long
+o <- pc %>% filter(Long == 0)
+o <- pc_na %>% filter(Lat == 0)
+o
+
+```
+
+
+
+
+```{r}
+#write.csv(pc , "C:/Users/1999i/Documents/smart_cities/Crime/Boston_property_crimes", row.names = FALSE)
+```
+
+
+
+
+
+
+```{r}
+Crimes_in_Boston <- read_csv("C:/Users/1999i/Documents/smart_cities/Crime/Crimes_in_Boston.csv")
+head(Crimes_in_Boston)
+```
+
+
+```{r}
+min(Crimes_in_Boston$date)
+max(Crimes_in_Boston$date)
+```
+
+
+```{r}
+crime_dt <- Crimes_in_Boston %>% select(date,YEAR,MONTH,OFFENSE_CODE_GROUP, DISTRICT, REPORTING_AREA, DAY_OF_WEEK, HOUR, STREET, Lat, Long)
+crime_dt
+
+```
+
+
+
+```{r}
+table(crime_dt$YEAR, crime_dt$DISTRICT)
+table(crime_dt$DISTRICT)
+```
+
+
+
+
+
+
+
+
+
+
